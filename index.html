@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校園安全與防災演練活動相簿</title>
+    <style>
+        :root {
+            --primary-color: #2a5298;
+            --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #64748b;
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 頁首標題區 */
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            text-align: center;
+            padding: 45px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.05rem;
+            opacity: 0.92;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* 分類篩選按鈕區 */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .filter-btn {
+            background: var(--card-bg);
+            border: 1px solid #dcdfe6;
+            padding: 9px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #555;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(42,82,152,0.3);
+        }
+
+        /* 照片畫廊網格 */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .photo-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .img-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 66.66%; /* 3:2 比例 */
+            background-color: #eef2f5;
+            overflow: hidden;
+        }
+
+        .img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .photo-card:hover .img-wrapper img {
+            transform: scale(1.06);
+        }
+
+        .placeholder-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .card-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .card-category {
+            align-self: flex-start;
+            font-size: 0.8rem;
+            padding: 3px 12px;
+            border-radius: 12px;
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            font-weight: 500;
+        }
+
+        /* 燈箱 Modal (點擊放大) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.88);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content-container {
+            position: relative;
+            max-width: 90%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-content {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+
+        .modal-caption {
+            margin-top: 15px;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            padding: 8px 24px;
+            border-radius: 20px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 38px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 1001;
+        }
+
+        .close-btn:hover {
+            color: #cbd5e0;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            font-size: 24px;
+            padding: 12px 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+            user-select: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .prev-btn { left: -60px; }
+        .next-btn { right: -60px; }
+
+        @media (max-width: 768px) {
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #718096;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 50px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>校園安全與防災演練活動相簿</h1>
+        <p>113學年度 新生宣導與防災避難演練精彩紀錄</p>
+    </header>
+
+    <div class="container">
+        <!-- 分類篩選按鈕區 -->
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filterPhotos('全部')">全部照片</button>
+            <button class="filter-btn" onclick="filterPhotos('活動紀錄')">活動紀錄</button>
+            <button class="filter-btn" onclick="filterPhotos('防災宣導')">防災宣導</button>
+            <button class="filter-btn" onclick="filterPhotos('避難演練')">避難演練</button>
+            <button class="filter-btn" onclick="filterPhotos('集合演練')">集合演練</button>
+        </div>
+
+        <!-- 照片展示網格 -->
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+
+    <!-- 燈箱 Modal -->
+    <div class="modal" id="photoModal" onclick="closeModal(event)">
+        <span class="close-btn" onclick="closeModal(event)">&times;</span>
+        <button class="nav-btn prev-btn" onclick="changePhoto(-1, event)">&#10094;</button>
+        <div class="modal-content-container">
+            <img class="modal-content" id="modalImg" src="" alt="">
+            <div class="modal-caption" id="modalCaption"></div>
+        </div>
+        <button class="nav-btn next-btn" onclick="changePhoto(1, event)">&#10095;</button>
+    </div>
+
+    <footer>
+        <p>&copy; 113學年度 校園安全與防災演練紀錄網頁 | 託管於 GitHub Pages</p>
+    </footer>
+
+    <script>
+        // 自動解析與轉換 Google Drive 共用連結為直連圖片網址
+        function fixDriveUrl(url) {
+            if (!url || url.startsWith('PHOTO_URL_')) return url;
+            
+            // 轉換 https://drive.google.com/file/d/FILE_ID/view...
+            let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            
+            // 轉換 https://drive.google.com/open?id=FILE_ID 或 ?id=FILE_ID
+            match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            
+            return url;
+        }
+
+        // 相片資料庫 (1 ~ 30)
+        const photos = [
+            { src: "https://lh3.googleusercontent.com/d/1J02GlLXYcPnmMtSelC-ugIGcjsOhW5pj", title: "新生互動提問", category: "活動紀錄" },
+            { src: "https://lh3.googleusercontent.com/d/1sSX4JJTd-enOsXBhbpyi70pqweniptY-", title: "地震防護宣導", category: "防災宣導" },
+            { src: "https://lh3.googleusercontent.com/d/1pD4-e2opwJTTi7RGOU-OZXB4VrVVbnzR", title: "校園安全宣導", category: "防災宣導" },
+            { src: "https://lh3.googleusercontent.com/d/1pOSKNNmATcsxVl_E19Jb8jZ2UTKYKviq", title: "請假外出規定", category: "活動紀錄" },
+            { src: "https://lh3.googleusercontent.com/d/1x93Fpi9aCB2yz_zdSjhCWBsaVCbYz_bj", title: "安全宣導說明", category: "防災宣導" },
+            { src: "https://lh3.googleusercontent.com/d/1Upfyr9TC2STorcgkuBxyPbv-kl4sZbLX", title: "四維堂疏散位置", category: "避難演練" },
+            { src: "https://lh3.googleusercontent.com/d/1vdhyp487Hgs_J3IqQ6_fcXMJ8Cr_UIOU", title: "戒菸與反毒宣導", category: "防災宣導" },
+            { src: "https://lh3.googleusercontent.com/d/18KvbZelzaxi-9BgTI2DegifwEPnCeG7-", title: "網路電子菸防制", category: "防災宣導" },
+            { src: "https://lh3.googleusercontent.com/d/1BBBLlnwPQrg9v823YcMO7cdpTyLt-4K5", title: "新生參與問答", category: "活動紀錄" },
+            
+            // 未來上傳 10 ~ 30 時，直接替換 "PHOTO_URL_X" 為 Google Drive 分享連結即可
+            { src: "PHOTO_URL_10", title: "指揮中心回報 10", category: "集合演練" },
+            { src: "PHOTO_URL_11", title: "滅火器操作示範 11", category: "防災宣導" },
+            { src: "PHOTO_URL_12", title: "學生實際操作 12", category: "活動紀錄" },
+            { src: "PHOTO_URL_13", title: "消防設施巡禮 13", category: "活動紀錄" },
+            { src: "PHOTO_URL_14", title: "救護站設置 14", category: "活動紀錄" },
+            { src: "PHOTO_URL_15", title: "傷患包紮演練 15", category: "活動紀錄" },
+            { src: "PHOTO_URL_16", title: "防災宣導 16", category: "防災宣導" },
+            { src: "PHOTO_URL_17", title: "避難演練 17", category: "避難演練" },
+            { src: "PHOTO_URL_18", title: "集合演練 18", category: "集合演練" },
+            { src: "PHOTO_URL_19", title: "活動紀錄 19", category: "活動紀錄" },
+            { src: "PHOTO_URL_20", title: "活動紀錄 20", category: "活動紀錄" },
+            { src: "PHOTO_URL_21", title: "防災宣導 21", category: "防災宣導" },
+            { src: "PHOTO_URL_22", title: "避難演練 22", category: "避難演練" },
+            { src: "PHOTO_URL_23", title: "集合演練 23", category: "集合演練" },
+            { src: "PHOTO_URL_24", title: "活動紀錄 24", category: "活動紀錄" },
+            { src: "PHOTO_URL_25", title: "活動紀錄 25", category: "活動紀錄" },
+            { src: "PHOTO_URL_26", title: "防災宣導 26", category: "防災宣導" },
+            { src: "PHOTO_URL_27", title: "避難演練 27", category: "避難演練" },
+            { src: "PHOTO_URL_28", title: "集合演練 28", category: "集合演練" },
+            { src: "PHOTO_URL_29", title: "活動紀錄 29", category: "活動紀錄" },
+            { src: "PHOTO_URL_30", title: "演練圓滿結束 30", category: "活動紀錄" }
+        ];
+
+        let currentCategory = '全部';
+        let currentFilteredPhotos = [];
+        let currentPhotoIndex = 0;
+
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            currentFilteredPhotos = currentCategory === '全部' 
+                ? photos 
+                : photos.filter(p => p.category === currentCategory);
+
+            currentFilteredPhotos.forEach((photo, idx) => {
+                const realSrc = fixDriveUrl(photo.src);
+                const isPlaceholder = realSrc.startsWith('PHOTO_URL_');
+
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                
+                let imgContent = isPlaceholder 
+                    ? `<div class="placeholder-img">📷 照片待上傳</div>`
+                    : `<img src="${realSrc}" alt="${photo.title}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'placeholder-img\\'>⚠️ 圖片載入失敗</div>';">`;
+
+                card.innerHTML = `
+                    <div class="img-wrapper">
+                        ${imgContent}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${photo.title}</div>
+                        <span class="card-category">${photo.category}</span>
+                    </div>
+                `;
+
+                if (!isPlaceholder) {
+                    card.onclick = () => openModal(idx);
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function filterPhotos(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === category || (category === '全部' && btn.textContent === '全部照片'));
+            });
+
+            renderGallery();
+        }
+
+        function openModal(index) {
+            currentPhotoIndex = index;
+            updateModalContent();
+            document.getElementById('photoModal').style.display = 'flex';
+        }
+
+        function updateModalContent() {
+            const photo = currentFilteredPhotos[currentPhotoIndex];
+            if (!photo) return;
+            const realSrc = fixDriveUrl(photo.src);
+            document.getElementById('modalImg').src = realSrc;
+            document.getElementById('modalCaption').textContent = photo.title;
+        }
+
+        function changePhoto(step, event) {
+            if (event) event.stopPropagation();
+            currentPhotoIndex += step;
+            if (currentPhotoIndex < 0) {
+                currentPhotoIndex = currentFilteredPhotos.length - 1;
+            } else if (currentPhotoIndex >= currentFilteredPhotos.length) {
+                currentPhotoIndex = 0;
+            }
+            updateModalContent();
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'photoModal' || e.target.className.includes('close-btn')) {
+                document.getElementById('photoModal').style.display = 'none';
+            }
+        }
+
+        // 鍵盤支援 (ESC 關閉、左右箭頭切換照片)
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('photoModal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'Escape') closeModal({ target: { id: 'photoModal' } });
+                if (e.key === 'ArrowLeft') changePhoto(-1);
+                if (e.key === 'ArrowRight') changePhoto(1);
+            }
+        });
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', renderGallery);
+    </script>
+</body>
+</html>
